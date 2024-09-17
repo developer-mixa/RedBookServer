@@ -1,0 +1,8 @@
+python-dotenv==1.0.1
+Django==5.0.3
+django-filter==24.2
+django-templated-mail==1.1.1
+djangorestframework==3.15.1
+psycopg==3.1.18
+psycopg-binary==3.1.18
+psycopg2-binary==2.9.9
