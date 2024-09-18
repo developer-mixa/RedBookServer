@@ -166,16 +166,22 @@ footer {
                             <p>{{ item.description|truncatewords:50 }}</p>
                             <span>Категория: {{ item.category.name }}</span>
                             <span>Местоположение: {{ item.location.name }}</span>
-                            <button class="verify-btn">Подтвердить</button>
+                            <form method="POST" action="{% url 'add_red_book_info' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="id" value="{{ item.id }}">
+                                <input type="hidden" name="name" value="{{ item.name }}">
+                                <input type="hidden" name="count" value="{{ item.count }}">
+                                <input type="hidden" name="description" value="{{ item.description }}">
+                                <input type="hidden" name="category_id" value="{{ item.category.id }}">
+                                <input type="hidden" name="location" value="{{ item.location.name }}">
+                                <input type="hidden" name="image" value="{{ item.image }}">
+                                <button type="submit" class="verify-btn">Подтвердить</button>
+                            </form>
                         </div>
                     </div>
                 {% endfor %}
             </div>
         </section>                                                                                                                                                                              
     </main>
-
-    <footer>
-        <p>&copy; 2024 Красная Книга</p>
-    </footer>
 </body>
 </html>

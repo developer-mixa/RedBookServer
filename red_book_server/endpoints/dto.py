@@ -17,12 +17,13 @@ class RedBookItemDTO:
 
     @staticmethod
     def from_json(json: dict):
-        location = json.get('location')
+        lon, lat = json.get('longitude'), json.get('latitude')
+        set_location = lon and lat
         return RedBookItemDTO(
             json['name'],
             json['description'],
             json['count'],
             json['image'],
             json['category_id'],
-            RedBookLocationDTO(location['longitude'], location['latitude']) if location else None
+            RedBookLocationDTO(lon, lat) if set_location else None
         )

@@ -1,8 +1,8 @@
 from django.core.handlers.wsgi import WSGIRequest
 from rest_framework.decorators import api_view
 from rest_framework import status
-from red_book_server.models.models import RedBookItem, Category, RedBookLocation, RedBookItemRequest
-from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
+from red_book_server.models.models import RedBookItem, Category, RedBookLocation, RedBookItemRequest, RedBookItemBase
+from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from red_book_server.serializers.main import RedBookSerializer
 from django.db.models import Q
 from json.decoder import JSONDecodeError
@@ -23,12 +23,32 @@ def __handle_errors(func):
             return HttpResponseBadRequest(e.message)
         except JSONDecodeError:
             return HttpResponseBadRequest('There is Invalid body!')
-        except TypeError:
-            return HttpResponseBadRequest('There is invalid type!')
+        except TypeError as e:
+            return HttpResponseBadRequest(f'There is invalid type! {e}')
         except IntegrityError:
             return HttpResponseBadRequest('This thing is already exists')
     return wrapper
 
+
+def __base_add_info(data, red_book_item_base: RedBookItemBase, success_response):
+    red_book_info = RedBookItemDTO.from_json(data)
+ 
+    location = None
+    location_dto = red_book_info.location
+
+    if location_dto:
+        location = RedBookLocation.objects.create(longitude=location_dto.longitude, latitude=location_dto.latitude)
+
+    red_book_item_base.objects.create(
+        name=red_book_info.name, 
+        description=red_book_info.description, 
+        image=red_book_info.image,
+        count=red_book_info.count, 
+        category=Category.objects.get(id=red_book_info.category_id), 
+        location=location
+    ).save()
+
+    return success_response
 
 @api_view(['GET'])
 def red_book_info(request: WSGIRequest):
@@ -48,25 +68,33 @@ def red_book_info(request: WSGIRequest):
 
     return JsonResponse(RedBookSerializer(red_book_items, many=True).data, safe=False)
 
+
+
 @api_view(['POST'])
 @__handle_errors
 def request_add_info(request: WSGIRequest):
-    red_book_info = RedBookItemDTO.from_json(request.data)
- 
-    location = None
-    location_dto = red_book_info.location
+    return __base_add_info(request.data, RedBookItemRequest, HttpResponse(status=status.HTTP_201_CREATED))
 
-    if location_dto:
-        location = RedBookLocation.objects.create(longitude=location_dto.longitude, latitude=location_dto.latitude)
+@api_view(['POST'])
+@__handle_errors
+def add_info(request: WSGIRequest):
 
-    RedBookItemRequest.objects.create(
-        name=red_book_info.name, 
-        description=red_book_info.description, 
-        image=red_book_info.image,
-        count=red_book_info.count, 
-        category=Category.objects.get(id=red_book_info.category_id), 
-        location=location
-    ).save()
+    # There was no time to think about better conditions :(
 
-    return HttpResponse(status=status.HTTP_201_CREATED)
+    id = request.POST.get('id')
 
+    data = {
+    'name': request.POST.get('name'),
+    'description': request.POST.get('description'),
+    'category_id': request.POST.get('category_id'),
+    'longitude': request.POST.get('longitude'),
+    'latitude': request.POST.get('latitude'),
+    'image': request.POST.get('image'),
+    'count': request.POST.get('count')
+    }
+
+    response = __base_add_info(data, RedBookItem, HttpResponseRedirect(request.META.get('HTTP_REFERER')))
+
+    RedBookItemRequest.objects.get(id=id).delete()
+
+    return response
