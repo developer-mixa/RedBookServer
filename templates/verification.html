@@ -1,0 +1,181 @@
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #3498db;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
+
+nav ul li {
+    margin: 0 10px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+    color: #ecf0f1;
+}
+
+main {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+section {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+}
+
+h2 {
+    color: #3498db;
+    margin-top: 0;
+}
+
+.request-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.request-item {
+    background-color: #f9fafc;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.request-item:hover {
+    transform: translateY(-5px);
+}
+
+.request-item img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 8px 8px 0 0;
+}
+
+.item-info {
+    padding: 1rem;
+}
+
+.item-info h3 {
+    font-size: 1.2em;
+    margin-bottom: 0.5rem;
+}
+
+.item-info p {
+    margin-bottom: 0.5rem;
+}
+
+.item-info span {
+    font-weight: bold;
+    margin-right: 1rem;
+}
+
+.verify-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.verify-btn:hover {
+    background-color: #2980b9;
+}
+
+footer {
+    background-color: #3498db;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    nav ul li {
+        margin: 5px 0;
+    }
+
+    main {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Верификация товаров в Красной Книге</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Красная Книга</h1>
+        <nav>
+            <ul>
+                <li><a href="#requests">Запросы</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="requests">
+            <h2>Список запросов</h2>
+            <div class="request-list">
+                {% for item in red_book_item_requests %}
+                    <div class="request-item">
+                        <img src="{{ item.image.url }}" alt="{{ item.name }}">
+                        <div class="item-info">
+                            <h3>{{ item.name }}</h3>
+                            <p>{{ item.description|truncatewords:50 }}</p>
+                            <span>Категория: {{ item.category.name }}</span>
+                            <span>Местоположение: {{ item.location.name }}</span>
+                            <button class="verify-btn">Подтвердить</button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>                                                                                                                                                                              
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Красная Книга</p>
+    </footer>
+</body>
+</html>

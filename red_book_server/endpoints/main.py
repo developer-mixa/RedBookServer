@@ -1,7 +1,7 @@
 from django.core.handlers.wsgi import WSGIRequest
 from rest_framework.decorators import api_view
 from rest_framework import status
-from red_book_server.models.models import RedBookItem, Category, RedBookLocation
+from red_book_server.models.models import RedBookItem, Category, RedBookLocation, RedBookItemRequest
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from red_book_server.serializers.main import RedBookSerializer
 from django.db.models import Q
@@ -50,7 +50,7 @@ def red_book_info(request: WSGIRequest):
 
 @api_view(['POST'])
 @__handle_errors
-def add_red_book_info(request: WSGIRequest):
+def request_add_info(request: WSGIRequest):
     red_book_info = RedBookItemDTO.from_json(request.data)
  
     location = None
@@ -59,7 +59,7 @@ def add_red_book_info(request: WSGIRequest):
     if location_dto:
         location = RedBookLocation.objects.create(longitude=location_dto.longitude, latitude=location_dto.latitude)
 
-    RedBookItem.objects.create(
+    RedBookItemRequest.objects.create(
         name=red_book_info.name, 
         description=red_book_info.description, 
         image=red_book_info.image,

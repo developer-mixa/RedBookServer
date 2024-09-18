@@ -25,13 +25,18 @@ class RedBookLocation(UUIDMixin):
         db_table = '"location"'
 
 
-class RedBookItem(UUIDMixin):
+class RedBookItemBase(UUIDMixin):
     name = models.TextField(unique=True, max_length=PARK_NAME_MAX_LEN, null=False, blank=False)
     description = models.TextField(unique=True, max_length=PARK_DESCRIPTION_MAX_LEN, null=False, blank=False)
     image = models.ImageField(upload_to='media')
     count = models.IntegerField(null=False, blank=False, validators=[check_positive_number])
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     location = models.ForeignKey(RedBookLocation, on_delete=models.SET_NULL, null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+class RedBookItem(RedBookItemBase):
 
     def __str__(self) -> str:
         return self.name
@@ -41,3 +46,10 @@ class RedBookItem(UUIDMixin):
         unique_together = ('name', 'description',)
 
 
+class RedBookItemRequest(RedBookItemBase):
+
+    def __str__(self) -> str:
+        return self.name
+    
+    class Meta:
+        db_table = '"red_book_item_request"'

@@ -316,9 +316,6 @@ input[type="file"] {
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-/* Остальные стили уже присутствуют */
-
-/* Добавим немного отступов для формы */
 form {
     display: inline-block;
     text-align: center;
@@ -329,5 +326,5 @@ form {
     position: relative;
     display: inline-block;
     margin-bottom: 20px;
-    margin-right: 10px; /* Добавить отступ между кнопками */
+    margin-right: 10px;
 }
