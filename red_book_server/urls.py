@@ -14,7 +14,8 @@ urlpatterns = [
     rest_path('/upload_book_info/', main.request_add_info, name='upload_book_info'),
     path('', red_book_site, name='home'),
     path('/upload/', upload_image, name='uploading'),
-    path('/add_red_book_info/', main.add_info, name='add_red_book_info')
+    path('/add_red_book_info/', main.add_info, name='add_red_book_info'),
+    path('/categories/', main.red_book_categories, name='categories')
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

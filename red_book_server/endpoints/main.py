@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from red_book_server.models.models import RedBookItem, Category, RedBookLocation, RedBookItemRequest, RedBookItemBase
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
-from red_book_server.serializers.main import RedBookSerializer
+from red_book_server.serializers.main import RedBookSerializer, CategorySerializer
 from django.db.models import Q
 from json.decoder import JSONDecodeError
 from red_book_server.endpoints.dto import RedBookItemDTO
@@ -68,6 +68,11 @@ def red_book_info(request: WSGIRequest):
 
     return JsonResponse(RedBookSerializer(red_book_items, many=True).data, safe=False)
 
+
+@api_view(['GET'])
+def red_book_categories(_: WSGIRequest):
+    categories = Category.objects.all()
+    return JsonResponse(CategorySerializer(categories, many=True).data, safe=False)
 
 
 @api_view(['POST'])
