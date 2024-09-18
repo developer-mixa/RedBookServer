@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Красная книга Москвы</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header id="home">
+        <div class="header-top">
+            <a href="https://green-code-moscow.ru/">
+                {% load static %}
+                <img src="{% static 'images/Рисунок1.png' %}" alt="Логотип Зелёного кода Москвы" class="logo"></a>
+            <div class="address">
+                Москва, ул. ул, д. 1
+            </div>
+        </div>
+
+        <hr class="header-separator">
+
+
+        <h1>Красная книга Москворецкого парка</h1>
+    </header>
+    <nav class="main-nav">
+        <ul>
+            <li><a href="#home" class="nav-button active">Главная</a></li>
+            <li><a href="#plants" class="nav-button">Растения</a></li>
+            <li><a href="#animals" class="nav-button">Животные</a></li>
+            <li><a href="{% url 'uploading' %}" class="nav-button">Отправить фото</a></li>
+            <li><a href="https://example.com" class="nav-button" target="_blank" rel="noopener noreferrer">К приложению</a></li>
+
+        </ul>
+    </nav>
+    <section id="plants">
+        <h2>Растения</h2>
+        <div class="gallery" id="plants-gallery">
+        </div>
+    </section>
+
+    <section id="animals">
+        <h2>Животные</h2>
+        <div class="gallery" id="animals-gallery">
+        </div>
+    </section>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span id="modal-close" class="close">&times;</span>
+            <h2 id="modal-title"></h2>
+            <img id="modal-image" src="" alt="" class="detail-image">
+            <p id="modal-description"></p>
+            <p> Численность: <span id="modal-count"></span></p>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Зелёный код Москвы</p>
+    </footer>
+
+    {% load static %}
+    <script src="{% static 'script.js' %}"></script>
+</body>
+</html>

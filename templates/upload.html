@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Отправить фото - Красная книга Москвы</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        #geolocation-status {
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #2E8B57;
+        }
+        #geolocation-status.error {
+            color: #FF6347;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-top">
+            <a href="https://green-code-moscow.ru/">
+                {% load static %}
+                <img src="{% static 'images/Рисунок1.png' %}" alt="Логотип Зелёного кода Москвы" class="logo">
+            </a>
+            <div class="address">
+                Москва, ул. ул, д. 1
+            </div>
+        </div>
+        <hr class="header-separator">
+        <h1>Отправить фото</h1>
+    </header>
+    
+    <nav class="main-nav">
+        <ul>
+            <li><a href="{% url 'home' %}" class="nav-button">Главная</a></li>
+        </ul>
+    </nav>
+
+    <section>
+        <h2>Загрузите ваше фото</h2>
+        <div id="geolocation-status">Определение вашего местоположения...</div>
+        <form id="upload-form" action="upload_handler.php" method="POST" enctype="multipart/form-data">
+            <div class="file-upload-wrapper">
+                <input type="file" id="photo" name="photo" accept="image/*" style="display:none;">
+                <button type="button" class="custom-file-upload" id="select-button">
+                    <span class="upload-icon">📁</span> Выбрать фото
+                </button>
+                <button type="button" class="custom-file-upload" id="capture-button">
+                    <span class="upload-icon">📷</span> Снять фото
+                </button>
+            </div>
+            <div id="preview" class="preview"></div>
+            
+            <input type="hidden" id="latitude" name="latitude">
+            <input type="hidden" id="longitude" name="longitude">
+            
+            <button type="submit" class="nav-button">Отправить</button>
+        </form>
+    </section>
+    
+    <footer>
+        <p>&copy; 2024 Зелёный код Москвы</p>
+    </footer>
+
+    <script>
+        const photoInput = document.getElementById('photo');
+        const preview = document.getElementById('preview');
+        const selectButton = document.getElementById('select-button');
+        const captureButton = document.getElementById('capture-button');
+        const geolocationStatus = document.getElementById('geolocation-status');
+        const latitudeInput = document.getElementById('latitude');
+        const longitudeInput = document.getElementById('longitude');
+        const form = document.getElementById('upload-form');
+
+        selectButton.addEventListener('click', function() {
+            photoInput.removeAttribute('capture');
+            photoInput.click();
+        });
+
+        captureButton.addEventListener('click', function() {
+            photoInput.setAttribute('capture', 'environment');
+            photoInput.click();
+        });
+
+        photoInput.addEventListener('change', function() {
+            preview.innerHTML = '';
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = "Превью изображения";
+                    img.classList.add('preview-image');
+                    preview.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', (event) => {
+            if (navigator.geolocation) {
+                console.log("Запрос геопозиции пользователя...");
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    latitudeInput.value = position.coords.latitude;
+                    longitudeInput.value = position.coords.longitude;
+                    geolocationStatus.textContent = `Местоположение: ${position.coords.latitude}, ${position.coords.longitude}`;
+
+                    console.log("Геопозиция получена:", position.coords.latitude, position.coords.longitude);
+                }, function(error) {
+                    geolocationStatus.textContent = "Не удалось определить местоположение.";
+                    geolocationStatus.classList.add('error');
+                    console.error("Ошибка при получении геопозиции:", error);
+                });
+            } else {
+                geolocationStatus.textContent = "Ваш браузер не поддерживает геолокацию.";
+                geolocationStatus.classList.add('error');
+                console.error("Geolocation API не поддерживается этим браузером.");
+            }
+        });
+
+        form.addEventListener('submit', function(event) {
+            if (!photoInput.files.length) {
+                alert("Пожалуйста, выберите или снимите фото перед отправкой.");
+                event.preventDefault();
+                return;
+            }
+
+            if (!latitudeInput.value || !longitudeInput.value) {
+                const proceed = confirm("Геопозиция не определена. Продолжить отправку без геоданных?");
+                if (!proceed) {
+                    event.preventDefault();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
