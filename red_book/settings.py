@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'red_book_server',
     'django.contrib.postgres',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
