@@ -6,6 +6,9 @@ from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from red_book_server.serializers.main import RedBookSerializer
 from django.db.models import Q
 from json.decoder import JSONDecodeError
+from red_book_server.endpoints.dto import RedBookItemDTO
+from django.core.exceptions import ValidationError
+from django.db.utils import IntegrityError
 
 
 def __handle_errors(func):
@@ -16,11 +19,16 @@ def __handle_errors(func):
             return HttpResponseBadRequest(str(e))
         except KeyError as e:
             return HttpResponseBadRequest(f'There is no key: {str(e)}')
+        except ValidationError as e:
+            return HttpResponseBadRequest(e.message)
         except JSONDecodeError:
             return HttpResponseBadRequest('There is Invalid body!')
         except TypeError:
             return HttpResponseBadRequest('There is invalid type!')
+        except IntegrityError:
+            return HttpResponseBadRequest('This thing is already exists')
     return wrapper
+
 
 @api_view(['GET'])
 def red_book_info(request: WSGIRequest):
@@ -43,25 +51,22 @@ def red_book_info(request: WSGIRequest):
 @api_view(['POST'])
 @__handle_errors
 def add_red_book_info(request: WSGIRequest):
-    image = request.FILES.get('image', None)
-    red_book_info = request.data
+    red_book_info = RedBookItemDTO.from_json(request.data)
+ 
+    location = None
+    location_dto = red_book_info.location
 
-    if image:
-        category = Category.objects.get(id=red_book_info['category_id'])
-        location = None
-        location_dto = red_book_info.get('location')
-        if location_dto:
-            longitude = location_dto['longitude']
-            latitude = location_dto['latitude']
-            if longitude and latitude:
-                location = RedBookLocation.objects.create(longitude=longitude, latitude=latitude)
-        RedBookItem.objects.create(
-            name=red_book_info['name'], 
-            description=red_book_info['description'], 
-            image=image, count=red_book_info['count'], 
-            category=category, 
-            location=location
-        ).save()
+    if location_dto:
+        location = RedBookLocation.objects.create(longitude=location_dto.longitude, latitude=location_dto.latitude)
+
+    RedBookItem.objects.create(
+        name=red_book_info.name, 
+        description=red_book_info.description, 
+        image=red_book_info.image,
+        count=red_book_info.count, 
+        category=Category.objects.get(id=red_book_info.category_id), 
+        location=location
+    ).save()
 
     return HttpResponse(status=status.HTTP_201_CREATED)
 
