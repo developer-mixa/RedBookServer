@@ -13,8 +13,8 @@ urlpatterns = [
     rest_path('/red_book_info/', main.red_book_info, name='red_book_info'),
     rest_path('/upload_book_info/', main.request_add_info, name='upload_book_info'),
     rest_path('/categories/', main.red_book_categories, name='categories'),
-    path('', red_book_site, name='home'),
-    path('/upload/', upload_image, name='uploading'),
+    #path('', red_book_site, name='home'),
+    #path('/upload/', upload_image, name='uploading'),
     path('/add_red_book_info/', main.add_info, name='add_red_book_info'),
 ]
 
